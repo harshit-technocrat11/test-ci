@@ -1,0 +1,20 @@
+name: Nimbus CI
+
+jobs:
+  node:
+    image: node:22
+    steps:
+      - node --version
+      - echo "Node job passed"
+
+  python:
+    image: python:3.13
+    steps:
+      - python --version
+      - echo "Python job passed"
+
+  alpine:
+    image: alpine:latest
+    steps:
+      - cat /etc/os-release
+      - echo "Alpine job passed"
