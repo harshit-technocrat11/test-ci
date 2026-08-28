@@ -1,20 +1,65 @@
 name: Nimbus CI
 
 jobs:
+
   node:
     image: node:22
+
+    env:
+      APP_ENV: test
+      NODE_ENV: ci
+      CI_MESSAGE: "Hello from Nimbus"
+
     steps:
       - node --version
+      - echo "Node job started"
+      - echo "APP_ENV=$APP_ENV"
+      - echo "NODE_ENV=$NODE_ENV"
+      - echo "CI_MESSAGE=$CI_MESSAGE"
+      - echo "Workspace contents:"
+      - ls -la
+      - node node-app/src/index.js
+      - node --test node-app/test/app.test.js
       - echo "Node job passed"
+
 
   python:
     image: python:3.13
+
+    env:
+      APP_ENV: test
+      PYTHON_ENV: ci
+      CI_MESSAGE: "Python job running"
+
     steps:
       - python --version
-      - echo "Python job passed"
+      - echo "Python job started"
+      - echo "APP_ENV=$APP_ENV"
+      - echo "PYTHON_ENV=$PYTHON_ENV"
+      - echo "CI_MESSAGE=$CI_MESSAGE"
+      - echo "Workspace contents:"
+      - ls -la
+      - python python-app/main.py
+      - python -m unittest discover -s python-app/tests -p "test_*.py"
+      - python -c "print('Python job passed')"
+
 
   alpine:
     image: alpine:latest
+
+    env:
+      APP_ENV: test
+      OS_NAME: alpine
+      CI_MESSAGE: "Alpine job running"
+
     steps:
       - cat /etc/os-release
+      - echo "Alpine job started"
+      - echo "APP_ENV=$APP_ENV"
+      - echo "OS_NAME=$OS_NAME"
+      - echo "CI_MESSAGE=$CI_MESSAGE"
+      - echo "Workspace contents:"
+      - ls -la
+      - sh scripts/system-check.sh
       - echo "Alpine job passed"
+
