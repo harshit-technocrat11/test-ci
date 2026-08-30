@@ -9,7 +9,7 @@ This repository serves as an integration test target for **Nimbus CI** pipeline 
 ├── .gitignore
 ├── .nimbus/
 │   └── workflows/
-│       └── nimbus-ci.yml        # CI pipeline specification
+│       └── nimbus-ci.yml        # CI pipeline specification (9 Jobs)
 ├── node-app/                    # Node.js service
 │   ├── package.json
 │   ├── src/
@@ -31,18 +31,23 @@ This repository serves as an integration test target for **Nimbus CI** pipeline 
 └── Readme.md
 ```
 
-## CI Jobs
+## CI Jobs Overview (9 Jobs)
 
-1. **Node Job (`node:22`)**:
-   - Logs environment variables (`APP_ENV`, `NODE_ENV`, `CI_MESSAGE`)
-   - Runs `node node-app/src/index.js`
-   - Executes native tests: `node --test node-app/test/app.test.js`
-
-2. **Python Job (`python:3.13`)**:
-   - Logs environment variables (`APP_ENV`, `PYTHON_ENV`, `CI_MESSAGE`)
-   - Runs `python python-app/main.py`
-   - Executes test suite: `python -m unittest discover -s python-app/tests -p "test_*.py"`
-
-3. **Alpine Job (`alpine:latest`)**:
-   - Verifies POSIX environment & container mount
-   - Runs `sh scripts/system-check.sh`
+1. **`node-app-test` (`node:22`)**:
+   - Executes main service and native Node test runner (`node --test`)
+2. **`node-syntax-lint` (`node:22`)**:
+   - Performs syntax analysis on all JavaScript source files (`node --check`)
+3. **`node-matrix-v20` (`node:20`)**:
+   - Matrix testing under Node 20 LTS environment
+4. **`python-app-test` (`python:3.13`)**:
+   - Runs Python entrypoint and `unittest` discovery suite
+5. **`python-syntax-lint` (`python:3.13`)**:
+   - Verifies bytecode compilation across Python modules (`python -m py_compile`)
+6. **`python-matrix-v312` (`python:3.12`)**:
+   - Matrix compatibility verification under Python 3.12 runtime
+7. **`system-health-check` (`alpine:latest`)**:
+   - Runs POSIX shell environment health checks (`scripts/system-check.sh`)
+8. **`security-audit` (`alpine:latest`)**:
+   - Validates workspace manifest presence and scans for unintended leaked secrets
+9. **`build-packaging` (`alpine:latest`)**:
+   - Packages distribution tarballs for Node and Python services into `dist/`

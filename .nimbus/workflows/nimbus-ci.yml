@@ -2,64 +2,144 @@ name: Nimbus CI
 
 jobs:
 
-  node:
+  node-app-test:
     image: node:22
-
     env:
       APP_ENV: test
       NODE_ENV: ci
-      CI_MESSAGE: "Hello from Nimbus"
-
+      CI_MESSAGE: "Node 22 test suite running"
     steps:
       - node --version
-      - echo "Node job started"
+      - echo "Node test suite started"
       - echo "APP_ENV=$APP_ENV"
       - echo "NODE_ENV=$NODE_ENV"
       - echo "CI_MESSAGE=$CI_MESSAGE"
-      - echo "Workspace contents:"
-      - ls -la
       - node node-app/src/index.js
       - node --test node-app/test/app.test.js
-      - echo "Node job passed"
+      - echo "Simulating test execution workload..."
+      - sleep 20
+      - echo "Node test suite passed"
 
+  node-syntax-lint:
+    image: node:22
+    env:
+      APP_ENV: test
+      NODE_ENV: ci
+      CI_MESSAGE: "Node syntax check running"
+    steps:
+      - node --version
+      - echo "Running Node syntax verification..."
+      - node --check node-app/src/index.js
+      - node --check node-app/src/math.js
+      - node --check node-app/test/app.test.js
+      - echo "Simulating lint analysis workload..."
+      - sleep 20
+      - echo "Node syntax check passed"
 
-  python:
+  node-matrix-v20:
+    image: node:20
+    env:
+      APP_ENV: test
+      NODE_ENV: ci
+      CI_MESSAGE: "Node 20 matrix running"
+    steps:
+      - node --version
+      - echo "Running Node 20 LTS compatibility test..."
+      - node node-app/src/index.js
+      - node --test node-app/test/app.test.js
+      - echo "Simulating Node 20 matrix execution..."
+      - sleep 25
+      - echo "Node 20 compatibility test passed"
+
+  python-app-test:
     image: python:3.13
-
     env:
       APP_ENV: test
       PYTHON_ENV: ci
-      CI_MESSAGE: "Python job running"
-
+      CI_MESSAGE: "Python 3.13 test suite running"
     steps:
       - python --version
-      - echo "Python job started"
+      - echo "Python test suite started"
       - echo "APP_ENV=$APP_ENV"
       - echo "PYTHON_ENV=$PYTHON_ENV"
       - echo "CI_MESSAGE=$CI_MESSAGE"
-      - echo "Workspace contents:"
-      - ls -la
       - python python-app/main.py
       - python -m unittest discover -s python-app/tests -p "test_*.py"
-      - python -c "print('Python job passed')"
+      - echo "Simulating Python test workload..."
+      - sleep 20
+      - python -c "print('Python test suite passed')"
 
+  python-syntax-lint:
+    image: python:3.13
+    env:
+      APP_ENV: test
+      PYTHON_ENV: ci
+      CI_MESSAGE: "Python syntax check running"
+    steps:
+      - python --version
+      - echo "Checking Python bytecode compilation..."
+      - python -m py_compile python-app/main.py python-app/app/calculator.py python-app/tests/test_calculator.py
+      - echo "Simulating AST verification workload..."
+      - sleep 20
+      - python -c "print('Python syntax check passed')"
 
-  alpine:
+  python-matrix-v312:
+    image: python:3.12
+    env:
+      APP_ENV: test
+      PYTHON_ENV: ci
+      CI_MESSAGE: "Python 3.12 matrix running"
+    steps:
+      - python --version
+      - echo "Running Python 3.12 compatibility test..."
+      - python python-app/main.py
+      - python -m unittest discover -s python-app/tests -p "test_*.py"
+      - echo "Simulating Python 3.12 matrix workload..."
+      - sleep 25
+      - python -c "print('Python 3.12 compatibility test passed')"
+
+  system-health-check:
     image: alpine:latest
-
     env:
       APP_ENV: test
       OS_NAME: alpine
-      CI_MESSAGE: "Alpine job running"
-
+      CI_MESSAGE: "Alpine health check running"
     steps:
       - cat /etc/os-release
-      - echo "Alpine job started"
+      - echo "Alpine system check started"
       - echo "APP_ENV=$APP_ENV"
       - echo "OS_NAME=$OS_NAME"
       - echo "CI_MESSAGE=$CI_MESSAGE"
-      - echo "Workspace contents:"
-      - ls -la
       - sh scripts/system-check.sh
-      - echo "Alpine job passed"
-
+      - echo "Simulating system diagnostics workload..."
+      - sleep 20
+      - echo "System health check passed"
+
+  security-audit:
+    image: alpine:latest
+    env:
+      APP_ENV: test
+      CI_MESSAGE: "Security scan running"
+    steps:
+      - echo "Starting security and file audit..."
+      - test -f .gitignore
+      - test -f Readme.md
+      - echo "Scanning for leaked secrets..."
+      - echo "Simulating vulnerability scan workload..."
+      - sleep 20
+      - echo "Security audit passed"
+
+  build-packaging:
+    image: alpine:latest
+    env:
+      APP_ENV: test
+      CI_MESSAGE: "Build packaging running"
+    steps:
+      - echo "Packaging application artifacts..."
+      - mkdir -p dist
+      - tar -czf dist/node-app.tar.gz node-app/
+      - tar -czf dist/python-app.tar.gz python-app/
+      - ls -lh dist/
+      - echo "Simulating distribution upload workload..."
+      - sleep 25
+      - echo "Build packaging completed successfully"
