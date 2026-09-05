@@ -1,6 +1,6 @@
 import { add, multiply, formatGreeting } from './math.js';
 
-console.log('==============================================');
+console.log('===============================================');
 console.log('       Nimbus CI - Node Service Run           ');
 console.log('==============================================');
 console.log(formatGreeting(process.env.APP_ENV || 'Nimbus CI'));
